@@ -17,6 +17,11 @@ inputs:
     required: false
     default: https://github.com/zephyrproject-rtos/sdk-ng/releases/download
 
+  toolchains:
+    description: List of toolchains to install, colon separated
+    required: false
+    default: arm-zephyr-eabi:riscv64-zephyr-elf
+
 runs:
   using: "composite"
   steps:
@@ -25,7 +30,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: zephyr-sdk
-        key: zephyr-sdk-v${{ inputs.sdk-version }}
+        key: zephyr-sdk-v${{ inputs.sdk-version }}-${{ inputs.toolchains }}
 
     - if: ${{ steps.cache-toolchain.outputs.cache-hit != 'true' }}
       name: Download Zephyr SDK
@@ -39,7 +44,12 @@ runs:
       working-directory: zephyr-sdk
       shell: bash
       run: |
-        ./setup.sh -t arm-zephyr-eabi -c
+        IFS=":"
+        toolchains="${{ inputs.toolchains }}"
+        for toolchain in $toolchains; do
+            ./setup.sh -t $toolchain
+        done
+        ./setup.sh -c
 
     - name: Install dependencies
       shell: bash
