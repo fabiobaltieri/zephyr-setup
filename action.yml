@@ -1,0 +1,65 @@
+# SPDX-License-Identifier: Apache-2.0
+
+name: Setup Zephyr project
+
+inputs:
+  app-path:
+    description: Application code path, should contain a west.yml file
+    required: true
+
+  sdk-version:
+    description: Zephyr SDK version to use
+    required: false
+    default: 0.16.1
+
+  sdk-base:
+    description: Base URL of the Zephyr SDK
+    required: false
+    default: https://github.com/zephyrproject-rtos/sdk-ng/releases/download
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Zephyr SDK
+      id: cache-toolchain
+      uses: actions/cache@v3
+      with:
+        path: zephyr-sdk
+        key: zephyr-sdk-v${{ inputs.sdk-version }}
+
+    - if: ${{ steps.cache-toolchain.outputs.cache-hit != 'true' }}
+      name: Download Zephyr SDK
+      shell: bash
+      run: |
+        wget --progress=dot:giga ${{ inputs.sdk-base }}/v${{ inputs.sdk-version }}/zephyr-sdk-${{ inputs.sdk-version }}_linux-x86_64_minimal.tar.xz
+        mkdir zephyr-sdk
+        tar xvf zephyr-sdk-${{ inputs.sdk-version }}_linux-x86_64_minimal.tar.xz -C zephyr-sdk --strip-components=1
+
+    - name: Setup Zephyr SDK
+      working-directory: zephyr-sdk
+      shell: bash
+      run: |
+        ./setup.sh -t arm-zephyr-eabi -c
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip3 install west
+        sudo apt-get install ninja-build
+
+    - name: Initialize
+      shell: bash
+      run: |
+        west init -l ${{ inputs.app-path }}
+        west update -o=--depth=1 -n
+
+    - name: Cache Python packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: pip-${{ hashFiles('zephyr/scripts/requirements*.txt') }}
+
+    - name: Install Python packages
+      shell: bash
+      run: |
+        pip3 install -r zephyr/scripts/requirements.txt
