@@ -17,6 +17,11 @@ inputs:
     required: false
     default: https://github.com/zephyrproject-rtos/sdk-ng/releases/download
 
+  sdk-variant:
+    description: Zephyr SDK variant (linux-x86_64, linux-aarch64...)
+    required: false
+    default: linux-x86_64
+
   toolchains:
     description: List of toolchains to install, colon separated
     required: false
@@ -30,23 +35,24 @@ runs:
       uses: actions/cache@v3
       with:
         path: zephyr-sdk
-        key: zephyr-sdk-v${{ inputs.sdk-version }}-${{ inputs.toolchains }}
+        key: zephyr-sdk-v${{ inputs.sdk-version }}-${{ inputs.sdk-variant }}-${{ inputs.toolchains }}
 
     - if: ${{ steps.cache-toolchain.outputs.cache-hit != 'true' }}
       name: Download Zephyr SDK
       shell: bash
       run: |
-        wget --progress=dot:giga ${{ inputs.sdk-base }}/v${{ inputs.sdk-version }}/zephyr-sdk-${{ inputs.sdk-version }}_linux-x86_64_minimal.tar.xz
+        SDK_FILE="zephyr-sdk-${{ inputs.sdk-version }}_${{ inputs.sdk-variant }}_minimal.tar.xz"
+        wget --progress=dot:giga ${{ inputs.sdk-base }}/v${{ inputs.sdk-version }}/$SDK_FILE
         mkdir zephyr-sdk
-        tar xvf zephyr-sdk-${{ inputs.sdk-version }}_linux-x86_64_minimal.tar.xz -C zephyr-sdk --strip-components=1
+        tar xvf $SDK_FILE -C zephyr-sdk --strip-components=1
 
     - name: Setup Zephyr SDK
       working-directory: zephyr-sdk
       shell: bash
       run: |
         IFS=":"
-        toolchains="${{ inputs.toolchains }}"
-        for toolchain in $toolchains; do
+        TOOLCHAINS="${{ inputs.toolchains }}"
+        for toolchain in $TOOLCHAINS; do
             ./setup.sh -t $toolchain
         done
         ./setup.sh -c
