@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Setup Zephyr project
+description: Setup a Zephyr base project using west and downloading the Zephyr SDK
 
 inputs:
   app-path:
