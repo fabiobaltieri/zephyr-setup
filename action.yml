@@ -56,6 +56,9 @@ runs:
         for toolchain in $TOOLCHAINS; do
             ./setup.sh -t $toolchain
         done
+        if [ ! -d sysroots ]; then
+            ./setup.sh -h
+        fi
         ./setup.sh -c
 
     - name: Install dependencies
