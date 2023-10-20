@@ -64,6 +64,7 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
+        pip3 install -U pip wheel
         pip3 install west
         sudo apt-get install ninja-build
 
