@@ -79,7 +79,11 @@ runs:
       run: |
         pip3 install -U pip wheel
         pip3 install west
-        sudo apt-get install ninja-build
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          sudo apt-get install ninja-build ccache
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          brew install ninja ccache
+        fi
 
     - name: Initialize
       shell: bash
