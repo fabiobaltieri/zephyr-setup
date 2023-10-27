@@ -78,7 +78,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: ~/.cache/pip
-        key: pip-${{ hashFiles('zephyr/scripts/requirements*.txt') }}
+        key: pip-${{ runner.os }}-${{ hashFiles('zephyr/scripts/requirements*.txt') }}
 
     - name: Install Python packages
       shell: bash
