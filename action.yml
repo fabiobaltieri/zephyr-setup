@@ -26,24 +26,29 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set SDK_FILE
-      id: sdk-file
+    - name: Environment setup
+      id: env-setup
       shell: bash
       run: |
         runner="${{ runner.os }}-${{ runner.arch }}"
         if [ "$runner" = "Linux-X64" ]; then
           sdk_variant="linux-x86_64"
+          pip_cache_path="~/.cache/pip"
         elif [ "$runner" = "Linux-ARM64" ]; then
           sdk_variant="linux-aarch64"
+          pip_cache_path="~/.cache/pip"
         elif [ "$runner" = "macOS-X64" ]; then
           sdk_variant="macos-x86_64"
+          pip_cache_path="~/Library/Caches/pip"
         elif [ "$runner" = "macOS-ARM64" ]; then
           sdk_variant="macos-aarch64"
+          pip_cache_path="~/Library/Caches/pip"
         else
           echo "Unsupported runner platform: $runner"
         fi
 
         echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}_minimal.tar.xz" >> $GITHUB_ENV
+        echo "PIP_CACHE_PATH=${pip_cache_path}" >> $GITHUB_ENV
 
     - name: Cache Zephyr SDK
       id: cache-toolchain
@@ -94,7 +99,7 @@ runs:
     - name: Cache Python packages
       uses: actions/cache@v3
       with:
-        path: ~/.cache/pip
+        path: ${{ env.PIP_CACHE_PATH }}
         key: pip-${{ runner.os }}-${{ hashFiles('zephyr/scripts/requirements*.txt') }}
 
     - name: Install Python packages
