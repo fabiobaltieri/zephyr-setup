@@ -18,11 +18,6 @@ inputs:
     required: false
     default: https://github.com/zephyrproject-rtos/sdk-ng/releases/download
 
-  sdk-variant:
-    description: Zephyr SDK variant (linux-x86_64, linux-aarch64...)
-    required: false
-    default: linux-x86_64
-
   toolchains:
     description: List of toolchains to install, colon separated
     required: false
@@ -35,7 +30,20 @@ runs:
       id: sdk-file
       shell: bash
       run: |
-        echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${{ inputs.sdk-variant }}_minimal.tar.xz" >> $GITHUB_ENV
+        runner="${{ runner.os }}-${{ runner.arch }}"
+        if [ "$runner" = "Linux-X64" ]; then
+          sdk_variant="linux-x86_64_minimal.tar.xz"
+        elif [ "$runner" = "Linux-ARM64" ]; then
+          sdk_variant="linux-aarch64_minimal.tar.xz"
+        elif [ "$runner" = "macOS-X64" ]; then
+          sdk_variant="macos-x86_64_minimal.tar.xz"
+        elif [ "$runner" = "macOS-ARM64" ]; then
+          sdk_variant="macos-aarch64_minimal.tar.xz"
+        else
+          echo "Unsupported runner platform: $runner"
+        fi
+
+        echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}" >> $GITHUB_ENV
 
     - name: Cache Zephyr SDK
       id: cache-toolchain
