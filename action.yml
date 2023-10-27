@@ -32,18 +32,18 @@ runs:
       run: |
         runner="${{ runner.os }}-${{ runner.arch }}"
         if [ "$runner" = "Linux-X64" ]; then
-          sdk_variant="linux-x86_64_minimal.tar.xz"
+          sdk_variant="linux-x86_64"
         elif [ "$runner" = "Linux-ARM64" ]; then
-          sdk_variant="linux-aarch64_minimal.tar.xz"
+          sdk_variant="linux-aarch64"
         elif [ "$runner" = "macOS-X64" ]; then
-          sdk_variant="macos-x86_64_minimal.tar.xz"
+          sdk_variant="macos-x86_64"
         elif [ "$runner" = "macOS-ARM64" ]; then
-          sdk_variant="macos-aarch64_minimal.tar.xz"
+          sdk_variant="macos-aarch64"
         else
           echo "Unsupported runner platform: $runner"
         fi
 
-        echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}" >> $GITHUB_ENV
+        echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}_minimal.tar.xz" >> $GITHUB_ENV
 
     - name: Cache Zephyr SDK
       id: cache-toolchain
