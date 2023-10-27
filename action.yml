@@ -31,18 +31,23 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Set SDK_FILE
+      id: sdk-file
+      shell: bash
+      run: |
+        echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${{ inputs.sdk-variant }}_minimal.tar.xz" >> $GITHUB_ENV
+
     - name: Cache Zephyr SDK
       id: cache-toolchain
       uses: actions/cache@v3
       with:
         path: zephyr-sdk
-        key: zephyr-sdk-v${{ inputs.sdk-version }}-${{ inputs.sdk-variant }}-${{ inputs.toolchains }}
+        key: ${{ env.SDK_FILE }}-${{ inputs.toolchains }}
 
     - if: ${{ steps.cache-toolchain.outputs.cache-hit != 'true' }}
       name: Download Zephyr SDK
       shell: bash
       run: |
-        SDK_FILE="zephyr-sdk-${{ inputs.sdk-version }}_${{ inputs.sdk-variant }}_minimal.tar.xz"
         wget --progress=dot:giga ${{ inputs.sdk-base }}/v${{ inputs.sdk-version }}/$SDK_FILE
         mkdir zephyr-sdk
         tar xvf $SDK_FILE -C zephyr-sdk --strip-components=1
