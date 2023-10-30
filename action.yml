@@ -33,18 +33,20 @@ runs:
         runner="${{ runner.os }}-${{ runner.arch }}"
         if [ "$runner" = "Linux-X64" ]; then
           sdk_variant="linux-x86_64"
-          pip_cache_path="~/.cache/pip"
         elif [ "$runner" = "Linux-ARM64" ]; then
           sdk_variant="linux-aarch64"
-          pip_cache_path="~/.cache/pip"
         elif [ "$runner" = "macOS-X64" ]; then
           sdk_variant="macos-x86_64"
-          pip_cache_path="~/Library/Caches/pip"
         elif [ "$runner" = "macOS-ARM64" ]; then
           sdk_variant="macos-aarch64"
-          pip_cache_path="~/Library/Caches/pip"
         else
           echo "Unsupported runner platform: $runner"
+        fi
+
+        if [ "runner.os" = "Linux" ]; then
+          pip_cache_path="~/.cache/pip"
+        elif [ "runner.os" = "macOS" ]; then
+          pip_cache_path="~/Library/Caches/pip"
         fi
 
         echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}_minimal.tar.xz" >> $GITHUB_ENV
