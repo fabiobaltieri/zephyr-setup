@@ -50,6 +50,17 @@ runs:
         echo "SDK_FILE=zephyr-sdk-${{ inputs.sdk-version }}_${sdk_variant}_minimal.tar.xz" >> $GITHUB_ENV
         echo "PIP_CACHE_PATH=${pip_cache_path}" >> $GITHUB_ENV
 
+    - name: Install dependencies
+      shell: bash
+      run: |
+        pip3 install -U pip wheel
+        pip3 install west
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          sudo apt-get install ninja-build ccache
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          brew install ninja ccache
+        fi
+
     - name: Cache Zephyr SDK
       id: cache-toolchain
       uses: actions/cache@v3
@@ -78,17 +89,6 @@ runs:
             ./setup.sh -h
         fi
         ./setup.sh -c
-
-    - name: Install dependencies
-      shell: bash
-      run: |
-        pip3 install -U pip wheel
-        pip3 install west
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          sudo apt-get install ninja-build ccache
-        elif [ "${{ runner.os }}" == "macOS" ]; then
-          brew install ninja ccache
-        fi
 
     - name: Initialize
       shell: bash
