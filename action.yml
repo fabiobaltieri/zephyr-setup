@@ -74,6 +74,9 @@ runs:
         pip3 install west
         if [ "${{ runner.os }}" = "Linux" ]; then
           sudo apt-get install ninja-build ccache
+          if [ "${{ runner.arch }}" = "X64" ]; then
+            sudo apt-get install libc6-dev-i386
+          fi
         elif [ "${{ runner.os }}" = "macOS" ]; then
           brew install ninja ccache
         elif [ "${{ runner.os }}" = "Windows" ]; then
