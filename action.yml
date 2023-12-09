@@ -73,6 +73,7 @@ runs:
         pip3 install -U pip wheel
         pip3 install west
         if [ "${{ runner.os }}" = "Linux" ]; then
+          sudo apt-get update
           sudo apt-get install ninja-build ccache
           if [ "${{ runner.arch }}" = "X64" ]; then
             sudo apt-get install libc6-dev-i386
