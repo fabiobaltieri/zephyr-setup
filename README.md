@@ -1,5 +1,11 @@
 # setup-zephyr
 
+
+> **Warning**
+>
+> This is not maintained or updated, please check out
+> https://github.com/zephyrproject-rtos/action-zephyr-setup instead.
+
 This actions initializes a Zephyr based project, downloading the Zephyr SDK and
 the necessary modules for a West based [Zephyr workspace application][1].
 
